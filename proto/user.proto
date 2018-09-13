@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package proto;
+
+service UserService {
+  rpc CreateUser (CreateUserRequest) returns (UserReply) {}
+  rpc ChangeNickname (ChangeNicknameRequest) returns (UserReply) {}
+  rpc ChangePassword (ChangePasswordRequest) returns (UserReply) {}
+  rpc CheckPassword( CheckPasswordRequest ) returns (UserReply) {}
+}
+
+message UserReply {
+    int32 status = 10;
+    string msgid = 20;
+}
+
+message CreateUserRequest {
+    string username = 10;
+    string nickname = 15;
+    string password = 20;
+}
+
+message ChangeNicknameRequest {
+    int64 id = 10;
+    string username = 20;
+}
+
+message ChangePasswordRequest {
+    string username = 10;
+    string oldpassowrd = 15;
+    string password = 20;
+}
+
+message CheckPasswordRequest {
+    string username = 10;
+    string password = 20;
+}
