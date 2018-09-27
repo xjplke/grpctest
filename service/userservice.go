@@ -13,6 +13,8 @@ import (
 //IUserRepo IUserRepo
 type IUserRepo interface {
 	Save(*model.User) (int64, error)
+	ChangeNickname(id int64, nickname string) error
+	CheckPassword(username, password string) error
 }
 
 //UserService UserService
@@ -38,8 +40,16 @@ func (us *UserService) CreateUser(c context.Context, req *pb.CreateUserRequest) 
 }
 
 //ChangeNickname ChangeNickname
-func (us *UserService) ChangeNickname(context.Context, *pb.ChangeNicknameRequest) (*pb.UserReply, error) {
-	return nil, errors.New("Unknow error")
+func (us *UserService) ChangeNickname(c context.Context, req *pb.ChangeNicknameRequest) (*pb.UserReply, error) {
+	err := us.Repo.ChangeNickname(req.Id, req.Nickname)
+	rep := &pb.UserReply{}
+	if err == nil {
+		rep.Status = 0
+	} else {
+		rep.Status = 1
+		rep.Msgid = "MSG_2"
+	}
+	return rep, err
 }
 
 //ChangePassword ChangePassword

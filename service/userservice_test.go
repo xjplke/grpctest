@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net"
 	"testing"
@@ -60,9 +61,24 @@ func TestCreateUser(t *testing.T) {
 		userService.Repo = mockRepo
 		mockRepo.EXPECT().Save(Any()).Return(int64(123), nil)
 
+		log.Println("Before Create User")
 		resp, err := client.CreateUser(ctx, &pb.CreateUserRequest{Username: "test1", Nickname: "nickname1", Password: "123qwe"})
 		So(err, ShouldEqual, nil)
 		So(resp, ShouldNotEqual, nil)
 		So(resp.Status, ShouldEqual, 0)
+
+		Convey("Can't Create User with same Username", func() {
+			mockRepo.EXPECT().Save(Any()).Return(int64(0), errors.New("duplicate Username"))
+
+			_, err := client.CreateUser(ctx, &pb.CreateUserRequest{Username: "test1", Nickname: "nickname1", Password: "123qwe"})
+			So(err, ShouldNotEqual, nil)
+		})
+
+		Convey("Update User Password", func() {
+			mockRepo.EXPECT().ChangeNickname(Any(), Any()).Return(nil)
+
+			_, err := client.ChangeNickname(ctx, &pb.ChangeNicknameRequest{Id: 123, Nickname: "nickname1"})
+			So(err, ShouldEqual, nil)
+		})
 	})
 }
